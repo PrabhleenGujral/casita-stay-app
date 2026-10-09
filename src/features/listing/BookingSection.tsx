@@ -20,7 +20,7 @@ import {
 } from "../../domain/dates";
 import type { GuestDetails } from "../../domain/guestDetails";
 import { calculatePrice } from "../../domain/pricing";
-import { formatShortDate, formatUsd, plural } from "../../lib/format";
+import { formatShortDate, formatCents, plural } from "../../lib/format";
 import type { ConfirmationState } from "../booking/confirmationState";
 import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import { BookingForm } from "./BookingForm";
@@ -63,7 +63,9 @@ export function BookingSection({ listing }: { listing: Listing }) {
     );
     if (validation.ok) nights = validation.nights;
   }
-  const price = nights ? calculatePrice(listing.pricePerNight, nights) : null;
+  const price = nights
+    ? calculatePrice(listing.pricePerNight / 100, nights)
+    : null;
 
   const refreshAvailability = () => {
     void queryClient.invalidateQueries({
@@ -182,7 +184,8 @@ export function BookingSection({ listing }: { listing: Listing }) {
 
       <aside className={styles.panel} aria-labelledby="booking-heading">
         <h2 id="booking-heading" className={styles.panelHeading}>
-          <strong>{formatUsd(listing.pricePerNight)}</strong> <span>night</span>
+          <strong>{formatCents(listing.pricePerNight)}</strong>{" "}
+          <span>per night</span>
         </h2>
 
         <div className={styles.dates}>
@@ -220,6 +223,7 @@ export function BookingSection({ listing }: { listing: Listing }) {
           datesError={
             price ? null : "Choose your check-in and check-out dates first."
           }
+          range={range}
           onSubmit={handleSubmit}
         />
       </aside>

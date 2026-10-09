@@ -31,6 +31,10 @@ export function toIsoDate(date: Date): IsoDate {
   return format(date, "yyyy-MM-dd");
 }
 
+export function getTodayIsoDate(): IsoDate {
+  return toIsoDate(new Date());
+}
+
 export function addDaysIso(date: IsoDate, amount: number): IsoDate {
   return toIsoDate(addDays(parseISO(date), amount));
 }

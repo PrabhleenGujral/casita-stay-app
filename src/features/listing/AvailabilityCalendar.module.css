@@ -1,13 +1,17 @@
 .months {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
 }
 
 .monthName {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
   text-align: center;
+  color: var(--color-text);
+  letter-spacing: -0.3px;
 }
 
 .grid {
@@ -17,59 +21,78 @@
 }
 
 .grid th {
-  padding-bottom: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding-bottom: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .grid td {
-  padding: 1px;
+  padding: 3px;
   text-align: center;
 }
 
 .day {
   width: 100%;
   aspect-ratio: 1;
-  max-width: 44px;
-  min-height: 36px;
-  border: 0;
-  border-radius: 50%;
+  max-width: 48px;
+  min-height: 40px;
+  border: none;
+  border-radius: 8px;
   background: none;
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--color-text);
 }
 
-.day:hover:not([aria-disabled='true']) {
-  background: var(--color-border);
+.day:hover:not([aria-disabled="true"]) {
+  background: #f0f0f0;
+  transform: scale(1.05);
 }
 
-.day[aria-disabled='true'] {
-  color: #a8a29e;
+.day:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.day[aria-disabled="true"] {
+  color: #ccc;
   cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .day[data-booked] {
   text-decoration: line-through;
+  color: #999;
 }
 
 /* A booked day that is still a valid check-out keeps its strike-through but reads as active. */
-.day[data-booked][aria-disabled='false'] {
+.day[data-booked][aria-disabled="false"] {
   color: var(--color-text);
+  font-weight: 600;
 }
 
 .day[data-in-range] {
   border-radius: 0;
-  background: var(--color-brand-soft);
+  background: rgba(52, 168, 224, 0.1);
+  color: var(--color-brand);
+  font-weight: 500;
 }
 
 .day[data-selected] {
   background: var(--color-brand);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
+  box-shadow: 0 2px 8px rgba(52, 168, 224, 0.3);
 }
 
 .day[data-selected]:hover {
   background: var(--color-brand-dark);
+  box-shadow: 0 4px 12px rgba(52, 168, 224, 0.4);
 }

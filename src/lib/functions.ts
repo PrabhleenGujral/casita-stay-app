@@ -66,9 +66,19 @@ export function clamp(day: IsoDate, min: IsoDate, max: IsoDate) {
 }
 
 //change to price from string to number, return null if invalid or negative
+// export function toPrice(value: string) {
+//   const price = Number.parseInt(value, 10);
+//   return Number.isNaN(price) || price < 0 ? null : price;
+// }
+
+// change to price from string to number, return null if invalid or negative
 export function toPrice(value: string) {
-  const price = Number.parseInt(value, 10);
-  return Number.isNaN(price) || price < 0 ? null : price;
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+  const num = Number(trimmed);
+  if (Number.isNaN(num) || num < 0) return null;
+  // treat input as dollars and return integer cents
+  return Math.round(num * 100);
 }
 //city heading for the search page
 export function getHeading(city: string) {

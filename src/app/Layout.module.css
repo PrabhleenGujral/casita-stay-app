@@ -18,6 +18,7 @@
   z-index: 5;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
 }
 
 .inner {
@@ -42,16 +43,18 @@
 }
 
 .navLink {
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius);
   color: var(--color-text);
   font-weight: 500;
   text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .navLink:hover,
-.navLink[aria-current='page'] {
-  background: var(--color-bg);
+.navLink[aria-current="page"] {
+  background: var(--color-secondary);
+  color: var(--color-brand);
 }
 
 .progress {

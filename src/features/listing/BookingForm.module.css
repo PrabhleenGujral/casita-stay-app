@@ -4,6 +4,45 @@
   gap: 0.75rem;
 }
 
+.calendarSection {
+  padding: 1rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.selectedDates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f5f7fa;
+  border: 1px solid #e5e9f0;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dateItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dateLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-muted);
+}
+
+.dateValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
 .fieldset {
   display: flex;
   flex-direction: column;
@@ -34,7 +73,7 @@
   background: var(--color-surface);
 }
 
-.field [aria-invalid='true'] {
+.field [aria-invalid="true"] {
   border-color: var(--color-danger);
   box-shadow: 0 0 0 1px var(--color-danger);
 }

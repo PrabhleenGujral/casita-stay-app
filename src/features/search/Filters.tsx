@@ -2,7 +2,6 @@ import type { SortOption } from "../../domain/search";
 import { CITIES, SORT_OPTIONS } from "../../domain/search";
 import { GUEST_OPTIONS, SORT_LABELS } from "../../lib/format";
 import { DEFAULT_FILTERS } from "../../lib/types";
-import { toPrice } from "../../lib/functions";
 import { DebouncedInput } from "./DebouncedInput";
 import type { SearchFilters } from "../../lib/types";
 import styles from "./Filters.module.css";
@@ -58,6 +57,73 @@ export function Filters({ filters, onChange }: FiltersProps) {
               id="filter-min-price"
               type="number"
               inputMode="numeric"
+              min="0"
+              step="0.01"
+              placeholder="Min"
+              value={
+                filters.minPrice != null
+                  ? (filters.minPrice / 100).toString()
+                  : ""
+              }
+              onCommit={(value) => {
+                const trimmed = value.trim();
+                if (trimmed === "") {
+                  onChange({ minPrice: null });
+                } else {
+                  const dollars = Number(trimmed);
+                  if (!Number.isNaN(dollars) && dollars >= 0) {
+                    const cents = Math.round(dollars * 100);
+                    onChange({ minPrice: cents });
+                  }
+                }
+              }}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="filter-max-price" className="visually-hidden">
+              Maximum price
+            </label>
+            <DebouncedInput
+              id="filter-max-price"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="0.01"
+              placeholder="Max"
+              value={
+                filters.maxPrice != null
+                  ? (filters.maxPrice / 100).toString()
+                  : ""
+              }
+              onCommit={(value) => {
+                const trimmed = value.trim();
+                if (trimmed === "") {
+                  onChange({ maxPrice: null });
+                } else {
+                  const dollars = Number(trimmed);
+                  if (!Number.isNaN(dollars) && dollars >= 0) {
+                    const cents = Math.round(dollars * 100);
+                    onChange({ maxPrice: cents });
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      {/* <fieldset className={styles.price}>
+        <legend>Price per night (USD)</legend>
+        <div className={styles.priceInputs}>
+          <div className={styles.field}>
+            <label htmlFor="filter-min-price" className="visually-hidden">
+              Minimum price
+            </label>
+            <DebouncedInput
+              id="filter-min-price"
+              type="number"
+              inputMode="numeric"
               min={0}
               placeholder="Min"
               value={filters.minPrice?.toString() ?? ""}
@@ -79,7 +145,7 @@ export function Filters({ filters, onChange }: FiltersProps) {
             />
           </div>
         </div>
-      </fieldset>
+      </fieldset> */}
 
       <div className={styles.field}>
         <label htmlFor="filter-guests">Guests</label>

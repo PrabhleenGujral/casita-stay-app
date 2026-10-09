@@ -1,4 +1,4 @@
-import type { SearchFilters } from "../domain/search";
+import type { SearchFilters } from "../lib/types";
 import { toSearchParams } from "../domain/search";
 import { request } from "./client";
 import type { BookingRequest } from "./schemas";

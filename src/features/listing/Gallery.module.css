@@ -12,6 +12,7 @@
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--color-border);
+  box-shadow: var(--shadow);
 }
 
 .stage img {
@@ -26,15 +27,21 @@
   transform: translateY(-50%);
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border: 0;
   border-radius: 50%;
-  background: rgb(255 255 255 / 92%);
-  box-shadow: var(--shadow);
+  background: rgb(255 255 255 / 95%);
+  box-shadow: var(--shadow-hover);
   font-size: 1.75rem;
   line-height: 1;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.arrow:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.05);
 }
 
 .previous {
@@ -82,7 +89,7 @@
   object-fit: cover;
 }
 
-.thumbnail[aria-current='true'] {
+.thumbnail[aria-current="true"] {
   border-color: var(--color-text);
   opacity: 1;
 }

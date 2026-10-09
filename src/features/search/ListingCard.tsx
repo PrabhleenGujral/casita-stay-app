@@ -1,7 +1,8 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
-import { formatUsd, plural } from "../../lib/format";
+import { formatCents, plural } from "../../lib/format";
 import { FavouriteButton } from "../favourites/FavouriteButton";
+import { MiniCalendar } from "./MiniCalendar";
 import styles from "./ListingCard.module.css";
 import type { ListingCardProps } from "../../lib/types";
 
@@ -11,6 +12,7 @@ export const ListingCard = memo(function ListingCard({
   priority = false,
   onPrefetch,
 }: ListingCardProps) {
+  const [showCalendar, setShowCalendar] = useState(false);
   const prefetch = () => onPrefetch?.(listing?.id);
 
   return (
@@ -54,9 +56,26 @@ export const ListingCard = memo(function ListingCard({
         <p className={styles.guests}>
           Up to {plural(listing?.maxGuests, "guest")}
         </p>
-        <p className={styles.price}>
-          <strong>{formatUsd(listing?.pricePerNight)}</strong> night
-        </p>
+
+        {showCalendar && (
+          <div className={styles.calendarPreview}>
+            <MiniCalendar listingId={listing?.id} />
+          </div>
+        )}
+
+        <div className={styles.footer}>
+          <p className={styles.price}>
+            <strong>{formatCents(listing?.pricePerNight)}</strong> per night
+          </p>
+          <button
+            type="button"
+            className={styles.calendarToggle}
+            onClick={() => setShowCalendar(!showCalendar)}
+            aria-label={showCalendar ? "Hide calendar" : "Show calendar"}
+          >
+            {showCalendar ? "Hide dates" : "Check dates"}
+          </button>
+        </div>
       </div>
     </article>
   );

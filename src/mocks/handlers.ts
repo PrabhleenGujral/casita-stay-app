@@ -173,7 +173,7 @@ export const handlers = [
       checkOut,
       guests,
       totalPrice:
-        calculatePrice(listing.pricePerNight, range.nights).total / 100,
+        calculatePrice(listing.pricePerNight / 100, range.nights).total / 100,
     };
     saveBooking(booking);
 

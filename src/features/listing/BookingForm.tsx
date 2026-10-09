@@ -5,12 +5,15 @@ import type {
   GuestDetailsErrors,
 } from "../../domain/guestDetails";
 import { validateGuestDetails } from "../../domain/guestDetails";
+import type { DateRange } from "../../domain/dates";
+// import { formatShortDate } from "../../lib/format";
 import styles from "./BookingForm.module.css";
 
 interface BookingFormProps {
   maxGuests: number;
   isSubmitting: boolean;
   datesError: string | null;
+  range?: DateRange;
   onSubmit: (details: GuestDetails) => void;
 }
 
@@ -23,6 +26,7 @@ export function BookingForm({
   maxGuests,
   isSubmitting,
   datesError,
+  // range,
   onSubmit,
 }: BookingFormProps) {
   const [values, setValues] = useState<GuestDetails>({
@@ -96,6 +100,23 @@ export function BookingForm({
       noValidate
       aria-label="Guest details"
     >
+      {/* {range?.checkIn && range?.checkOut && (
+        <div className={styles.selectedDates}>
+          <div className={styles.dateItem}>
+            <span className={styles.dateLabel}>Check-in</span>
+            <span className={styles.dateValue}>
+              {formatShortDate(range.checkIn)}
+            </span>
+          </div>
+          <div className={styles.dateItem}>
+            <span className={styles.dateLabel}>Check-out</span>
+            <span className={styles.dateValue}>
+              {formatShortDate(range.checkOut)}
+            </span>
+          </div>
+        </div>
+      )} */}
+
       <fieldset disabled={isSubmitting} className={styles.fieldset}>
         <div className={styles.field}>
           <label htmlFor="booking-name">Full name</label>
@@ -140,9 +161,11 @@ export function BookingForm({
         </div>
       </fieldset>
 
-      <p className={styles.error} role="alert">
-        {submitted && datesError}
-      </p>
+      {submitted && datesError && (
+        <p className={styles.error} role="alert">
+          {submitted && datesError}
+        </p>
+      )}
 
       <button
         type="submit"
