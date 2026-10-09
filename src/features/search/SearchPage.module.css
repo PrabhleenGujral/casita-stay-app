@@ -1,0 +1,45 @@
+.heading {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .heading {
+    font-size: 1.875rem;
+  }
+}
+
+.status {
+  min-height: 1.5rem;
+  margin: 1rem 0 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity 0.2s;
+}
+
+.grid[data-stale] {
+  opacity: 0.55;
+}
+
+.skeleton {
+  aspect-ratio: 4 / 4.4;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #eeeceb 25%, #f6f5f4 50%, #eeeceb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

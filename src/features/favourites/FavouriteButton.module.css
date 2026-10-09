@@ -1,0 +1,16 @@
+.button {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  color: var(--color-brand);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #fff;
+}
