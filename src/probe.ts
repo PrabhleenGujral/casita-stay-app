@@ -25,13 +25,13 @@ export async function runProbe() {
     // Try to lazy-import a Node fetch implementation (undici preferred).
     try {
       // undici exports fetch
-      // @ts-ignore - dynamic import types may vary
+      // @ts-expect-error - dynamic import types may vary
       const undici = await import("undici");
       fetchFn = undici.fetch as unknown as typeof fetch;
     } catch {
       try {
         // node-fetch v3 exports a default function
-        // @ts-ignore
+        // @ts-expect-error - dynamic import types may vary
         const nodeFetch = await import("node-fetch");
         // node-fetch default or named export fallback
         fetchFn = (nodeFetch.default ?? nodeFetch) as unknown as typeof fetch;
@@ -66,7 +66,6 @@ export async function runProbe() {
 
 // Optional: run only when explicitly requested via env var
 if (import.meta.env.VITE_RUN_PROBE === "1") {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  runProbe();
+  void runProbe();
 }
 // ...existing code...

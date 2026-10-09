@@ -31,7 +31,9 @@ async function readErrorMessage(response: Response) {
   try {
     const body = errorBodySchema.safeParse(await response.json());
     if (body.success) return body.data.message;
-  } catch {}
+  } catch {
+    // Ignore errors, return generic message below
+  }
   return `Request failed with status ${response.status}`;
 }
 

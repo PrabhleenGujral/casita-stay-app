@@ -1,11 +1,9 @@
-/// <reference types="vitest" />
-// ...existing code...
+import { beforeAll, afterEach, afterAll } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
 import { mockConfig } from "../mocks/handlers";
 import { resetDb } from "../mocks/db";
 import { server } from "../mocks/node";
-import { beforeAll, afterEach, afterAll } from "vitest";
 
 // Tests should be fast and deterministic, so the mock API never stalls or fails on its own.
 Object.assign(mockConfig, {

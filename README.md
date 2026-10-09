@@ -2,6 +2,8 @@
 
 A home rental app built with **React, TypeScript, and TanStack Query**. Users can search for homes, view details, check availability, calculate prices, and book stays. The API is mocked with MSW and intentionally simulates slow requests and errors.
 
+Project Link : https://casita-stays-app.netlify.app/
+
 ## Getting Started
 
 **Requirements:** Node.js 20+ and pnpm.
@@ -10,8 +12,6 @@ A home rental app built with **React, TypeScript, and TanStack Query**. Users ca
 pnpm install
 pnpm dev
 ```
-
-App runs at `http://localhost:5173`.
 
 ## Scripts
 
@@ -24,6 +24,7 @@ App runs at `http://localhost:5173`.
 | `pnpm build`        | Build for production |
 
 ## Project Structure
+
 ```
 src/
   domain/        Pure TypeScript. Pricing, date ranges, search params, form validation. No React.
@@ -65,7 +66,7 @@ Includes **unit and integration tests** covering pricing, date rules, search fil
 - I have spent **7-8 Hrs** on the project.
 
 - I used Claude, mainly for speed on code I’d otherwise type by hand.
-My decisions: the architecture (pure domain/ layer, TanStack Query for server state, URL as the only store for search state), the booking rules (stays as nights, integer cents, the 409 flow), the list of test cases, etc.
+  My decisions: the architecture (pure domain/ layer, TanStack Query for server state, URL as the only store for search state), the booking rules (stays as nights, integer cents, the 409 flow), the list of test cases, etc.
 
 - AI-assisted: project setup, Zod schemas and MSW handlers from the API spec, the mock data generator, writing test code from my case list.
 
