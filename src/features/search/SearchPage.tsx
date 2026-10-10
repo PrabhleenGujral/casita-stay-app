@@ -5,11 +5,11 @@ import { EmptyState } from "../../components/EmptyState";
 import { ErrorState } from "../../components/ErrorState";
 import { useFavourites } from "../favourites/favourites";
 import { Filters } from "./Filters";
-import { ListingCard } from "./ListingCard";
-import { Pagination } from "./Pagination";
 import { useSearchFilters } from "./useSearchFilters";
+import { VirtualizedGrid } from "./VirtualizedGrid";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import styles from "./SearchPage.module.css";
-import { PRIORITY_IMAGES, SKELETON_COUNT } from "../../lib/types";
+import { SKELETON_COUNT } from "../../lib/types";
 import { getHeading, getResultSummary } from "../../lib/functions";
 
 export function SearchPage() {
@@ -27,7 +27,23 @@ export function SearchPage() {
   const clearFilters = () =>
     setFilters({ city: "", minPrice: null, maxPrice: null, guests: null });
 
+  // Calculate if there are more pages to load
+  const currentPage = filters.page || 1;
   const totalPages = data ? Math.ceil(data?.total / data?.pageSize) : 0;
+  const hasMore = currentPage < totalPages;
+
+  // Load next page
+  const loadMorePage = useCallback(() => {
+    if (!hasMore || isPending) return;
+    setFilters({ page: currentPage + 1 });
+  }, [hasMore, isPending, currentPage, setFilters]);
+
+  // Infinite scroll trigger
+  const infiniteScrollRef = useInfiniteScroll({
+    onLoadMore: loadMorePage,
+    isLoading: isPending || isPlaceholderData,
+    hasMore,
+  });
 
   let content;
   if (isError) {
@@ -65,23 +81,35 @@ export function SearchPage() {
   } else {
     content = (
       <>
-        <ul
-          className={styles.grid}
-          aria-busy={isPlaceholderData}
-          data-stale={isPlaceholderData || undefined}
-        >
-          {data?.items?.map((listing, index) => (
-            <li key={listing.id}>
-              <ListingCard
-                listing={listing}
-                isFavourite={favourites.has(listing?.id)}
-                priority={index < PRIORITY_IMAGES}
-                onPrefetch={prefetchListing}
-              />
-            </li>
-          ))}
-        </ul>
-        <Pagination filters={filters} totalPages={totalPages} />
+        <VirtualizedGrid
+          items={data?.items ?? []}
+          isFavourites={favourites}
+          isPlaceholderData={isPlaceholderData}
+          onPrefetch={prefetchListing}
+        />
+
+        {/* Loading indicator for more items */}
+        {hasMore && (
+          <>
+            <div
+              ref={infiniteScrollRef}
+              className={styles.infiniteScrollTrigger}
+            />
+            {(isPending || isPlaceholderData) && (
+              <div className={styles.loadingMore} aria-busy="true">
+                <div className={styles.spinner} />
+                <p>Loading more homes...</p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* End of results message */}
+        {!hasMore && data?.items && data.items.length > 0 && (
+          <div className={styles.endMessage}>
+            <p>You've reached the end of available homes</p>
+          </div>
+        )}
       </>
     );
   }

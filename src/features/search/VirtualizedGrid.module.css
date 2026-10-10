@@ -1,0 +1,17 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity 0.2s;
+}
+
+.grid[data-stale] {
+  opacity: 0.6;
+}
+
+.item {
+  position: relative;
+}
