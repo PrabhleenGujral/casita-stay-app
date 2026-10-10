@@ -1,6 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import {
   keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQueries,
   useQuery,
@@ -24,11 +25,19 @@ export const listingKeys = {
     ["listings", "availability", id, month] as const,
 };
 
-// Search results.
+// Search results. Every page that is loaded is kept (not replaced), so the
+// list keeps growing as the user scrolls and earlier homes stay available.
 export function useListingSearch(filters: SearchFilters) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: listingKeys.search(filters),
-    queryFn: ({ signal }) => fetchListings(filters, signal),
+    // The page in the URL is where loading starts; next pages follow it.
+    initialPageParam: filters.page,
+    queryFn: ({ pageParam, signal }) =>
+      fetchListings({ ...filters, page: pageParam }, signal),
+    getNextPageParam: (lastPage) =>
+      lastPage.page * lastPage.pageSize < lastPage.total
+        ? lastPage.page + 1
+        : undefined,
     placeholderData: keepPreviousData,
   });
 }

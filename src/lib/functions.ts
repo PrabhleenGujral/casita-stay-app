@@ -65,19 +65,12 @@ export function clamp(day: IsoDate, min: IsoDate, max: IsoDate) {
   return day;
 }
 
-//change to price from string to number, return null if invalid or negative
-// export function toPrice(value: string) {
-//   const price = Number.parseInt(value, 10);
-//   return Number.isNaN(price) || price < 0 ? null : price;
-// }
-
 // change to price from string to number, return null if invalid or negative
 export function toPrice(value: string) {
   const trimmed = value.trim();
   if (trimmed === "") return null;
   const num = Number(trimmed);
   if (Number.isNaN(num) || num < 0) return null;
-  // treat input as dollars and return integer cents
   return Math.round(num * 100);
 }
 //city heading for the search page
@@ -89,16 +82,17 @@ export function getHeading(city: string) {
   );
   return knownCity ? `Homes in ${knownCity}` : `Homes matching “${city}”`;
 }
-// Result summary for the search page
+// result summary for the search page
 export function getResultSummary(
   total: number,
   page: number,
-  pageSize: number
+  pageSize: number,
+  pageCount = 1
 ) {
   if (total === 0) return "No homes found";
 
   const first = (page - 1) * pageSize + 1;
-  const last = Math.min(page * pageSize, total);
+  const last = Math.min((page + pageCount - 1) * pageSize, total);
   if (first > total) return `${plural(total, "home")} found`;
 
   return `Showing ${first}–${last} of ${plural(total, "home")}`;
