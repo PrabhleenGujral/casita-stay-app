@@ -16,10 +16,24 @@ export function Filters({ filters, onChange }: FiltersProps) {
     filters.city !== DEFAULT_FILTERS.city ||
     filters.minPrice !== null ||
     filters.maxPrice !== null ||
-    filters.guests !== null;
+    filters.guests !== null ||
+    filters.sort !== DEFAULT_FILTERS.sort;
 
+  // Clearing also resets the sort to the default.
   const clearFilters = () =>
-    onChange({ city: "", minPrice: null, maxPrice: null, guests: null });
+    onChange({
+      city: DEFAULT_FILTERS.city,
+      minPrice: null,
+      maxPrice: null,
+      guests: null,
+      sort: DEFAULT_FILTERS.sort,
+    });
+
+  // The search still runs with an inverted range.
+  const isPriceRangeInverted =
+    filters.minPrice !== null &&
+    filters.maxPrice !== null &&
+    filters.minPrice > filters.maxPrice;
 
   return (
     <form
@@ -46,7 +60,10 @@ export function Filters({ filters, onChange }: FiltersProps) {
         </datalist>
       </div>
 
-      <fieldset className={styles.price}>
+      <fieldset
+        className={styles.price}
+        aria-describedby={isPriceRangeInverted ? "price-range-hint" : undefined}
+      >
         <legend>Price per night (USD)</legend>
         <div className={styles.priceInputs}>
           <div className={styles.field}>
@@ -111,41 +128,14 @@ export function Filters({ filters, onChange }: FiltersProps) {
             />
           </div>
         </div>
+        <p
+          id="price-range-hint"
+          className={styles.priceHint}
+          aria-live="polite"
+        >
+          {isPriceRangeInverted ? "Minimum price is higher than maximum." : ""}
+        </p>
       </fieldset>
-
-      {/* <fieldset className={styles.price}>
-        <legend>Price per night (USD)</legend>
-        <div className={styles.priceInputs}>
-          <div className={styles.field}>
-            <label htmlFor="filter-min-price" className="visually-hidden">
-              Minimum price
-            </label>
-            <DebouncedInput
-              id="filter-min-price"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              placeholder="Min"
-              value={filters.minPrice?.toString() ?? ""}
-              onCommit={(value) => onChange({ minPrice: toPrice(value) })}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="filter-max-price" className="visually-hidden">
-              Maximum price
-            </label>
-            <DebouncedInput
-              id="filter-max-price"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              placeholder="Max"
-              value={filters.maxPrice?.toString() ?? ""}
-              onCommit={(value) => onChange({ maxPrice: toPrice(value) })}
-            />
-          </div>
-        </div>
-      </fieldset> */}
 
       <div className={styles.field}>
         <label htmlFor="filter-guests">Guests</label>

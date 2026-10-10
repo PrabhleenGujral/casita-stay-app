@@ -1,17 +1,62 @@
-.months {
+/* Calendar styles: paging buttons, month grids, day states, range band and legend. */
+.calendar {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 2rem;
-  padding: 2rem 0;
+  gap: 0.75rem;
+}
+
+.paging {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pageButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+.pageButton:disabled {
+  color: var(--color-muted);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.monthsOne,
+.monthsTwo {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.monthsOne {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.monthsTwo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.month {
+  min-width: 0;
 }
 
 .monthName {
-  margin-bottom: 1.5rem;
-  font-size: 1.125rem;
-  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
   text-align: center;
-  color: var(--color-text);
-  letter-spacing: -0.3px;
 }
 
 .grid {
@@ -21,78 +66,164 @@
 }
 
 .grid th {
-  padding-bottom: 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
+  padding-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .grid td {
-  padding: 3px;
+  padding: 0;
   text-align: center;
 }
 
+.grid td[data-in-range],
+.grid td[data-preview] {
+  background: var(--color-brand-soft);
+}
+
+.grid td[data-range-start] {
+  background: linear-gradient(to right, transparent 50%, var(--color-brand-soft) 50%);
+}
+
+.grid td[data-range-end] {
+  background: linear-gradient(to right, var(--color-brand-soft) 50%, transparent 50%);
+}
+
 .day {
+  position: relative;
+  display: grid;
+  place-items: center;
   width: 100%;
+  max-width: 44px;
+  min-height: 44px;
   aspect-ratio: 1;
-  max-width: 48px;
-  min-height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: none;
+  margin-inline: auto;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
   font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
-  color: var(--color-text);
 }
 
-.day:hover:not([aria-disabled="true"]) {
-  background: #f0f0f0;
-  transform: scale(1.05);
+.day:hover:not([aria-disabled='true']) {
+  background: var(--color-border);
 }
 
-.day:focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-.day[aria-disabled="true"] {
-  color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.4;
+.day[data-outside] {
+  color: var(--color-muted);
+  text-decoration: none;
+  cursor: default;
 }
 
 .day[data-booked] {
+  background: repeating-linear-gradient(135deg, var(--color-bg) 0 4px, var(--color-border) 4px 5px);
   text-decoration: line-through;
-  color: #999;
+  cursor: not-allowed;
 }
 
-/* A booked day that is still a valid check-out keeps its strike-through but reads as active. */
-.day[data-booked][aria-disabled="false"] {
+.day[data-booked][aria-disabled='false'] {
+  background: transparent;
   color: var(--color-text);
-  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.day[data-in-range] {
-  border-radius: 0;
-  background: rgba(52, 168, 224, 0.1);
-  color: var(--color-brand);
-  font-weight: 500;
+.day[data-booked][aria-disabled='false']:hover:not([data-selected]) {
+  background: var(--color-border);
+}
+
+.day[data-outside][data-booked] {
+  background: transparent;
+  text-decoration: none;
+  cursor: default;
+}
+
+.day[data-today]::after {
+  position: absolute;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  content: '';
 }
 
 .day[data-selected] {
   background: var(--color-brand);
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(52, 168, 224, 0.3);
+}
+
+.day[data-selected]::after {
+  background: #fff;
 }
 
 .day[data-selected]:hover {
   background: var(--color-brand-dark);
-  box-shadow: 0 4px 12px rgba(52, 168, 224, 0.4);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border: 1px solid var(--color-border);
+}
+
+.availableSwatch {
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+.bookedSwatch {
+  border-radius: 50%;
+  background: repeating-linear-gradient(135deg, var(--color-bg) 0 4px, var(--color-border) 4px 5px);
+}
+
+.selectedSwatch {
+  width: 22px;
+  flex-basis: 22px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent 25%,
+    var(--color-brand-soft) 25% 75%,
+    transparent 75%
+  );
+}
+
+.selectedSwatch::after {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  content: '';
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }

@@ -36,10 +36,21 @@
 }
 
 .hint {
-  margin: 0.5rem 0 2rem;
+  margin: 0.5rem 0 1rem;
   font-size: 0.95rem;
   color: var(--color-muted);
   font-weight: 500;
+}
+
+.notice {
+  margin: 0 0 1rem;
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.notice:empty {
+  margin: 0;
 }
 
 .loading {

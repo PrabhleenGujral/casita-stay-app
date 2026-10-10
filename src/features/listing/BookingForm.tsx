@@ -6,7 +6,6 @@ import type {
 } from "../../domain/guestDetails";
 import { validateGuestDetails } from "../../domain/guestDetails";
 import type { DateRange } from "../../domain/dates";
-// import { formatShortDate } from "../../lib/format";
 import styles from "./BookingForm.module.css";
 
 interface BookingFormProps {
@@ -91,6 +90,12 @@ export function BookingForm({
     );
   };
 
+  // Every visible error in field order.
+  const visibleErrors = FIELD_ORDER.flatMap((field) => {
+    const error = getError(field);
+    return error ? [{ field, error }] : [];
+  });
+
   const guestOptions = Array.from({ length: maxGuests }, (_, i) => i + 1);
 
   return (
@@ -100,22 +105,16 @@ export function BookingForm({
       noValidate
       aria-label="Guest details"
     >
-      {/* {range?.checkIn && range?.checkOut && (
-        <div className={styles.selectedDates}>
-          <div className={styles.dateItem}>
-            <span className={styles.dateLabel}>Check-in</span>
-            <span className={styles.dateValue}>
-              {formatShortDate(range.checkIn)}
-            </span>
-          </div>
-          <div className={styles.dateItem}>
-            <span className={styles.dateLabel}>Check-out</span>
-            <span className={styles.dateValue}>
-              {formatShortDate(range.checkOut)}
-            </span>
-          </div>
+      {submitted && visibleErrors.length > 0 && (
+        <div role="alert" className={styles.errorSummary}>
+          <p>Please fix the following:</p>
+          <ul>
+            {visibleErrors.map(({ field, error }) => (
+              <li key={field}>{error}</li>
+            ))}
+          </ul>
         </div>
-      )} */}
+      )}
 
       <fieldset disabled={isSubmitting} className={styles.fieldset}>
         <div className={styles.field}>

@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { http } from "msw";
+import { http, HttpResponse } from "msw";
 import type { Listing } from "../../api/schemas";
 import { calculatePrice } from "../../domain/pricing";
 import { formatCents } from "../../lib/format";
@@ -45,7 +45,7 @@ describe("booking flow", () => {
     await user.click(day("Monday, October 12, 2026"));
     await user.click(day("Wednesday, October 14, 2026"));
 
-    const total = formatCents(calculatePrice(listing.pricePerNight, 2).total);
+    const total = formatCents(calculatePrice(listing.pricePerNight / 100, 2).total);
     const panel = screen.getByRole("complementary");
     expect(within(panel).getByText(total)).toBeInTheDocument();
 
@@ -139,6 +139,99 @@ describe("booking flow", () => {
         name: `You are going to ${listing.city}!`,
       })
     ).toBeInTheDocument();
+  });
+
+  it.each([
+    [
+      "a 400 with a server message",
+      HttpResponse.json({ message: "Guest count is too high" }, { status: 400 }),
+      "Guest count is too high. Your booking was not made, please try again.",
+    ],
+    [
+      "a 400 without a readable body",
+      new HttpResponse("oops", { status: 400 }),
+      "Something went wrong while contacting the server. Your booking was not made, please try again.",
+    ],
+    [
+      "a 404",
+      HttpResponse.json({ message: "Not found" }, { status: 404 }),
+      "This home is no longer available. Your booking was not made, please try again.",
+    ],
+    [
+      "a 500",
+      HttpResponse.json({ message: "boom" }, { status: 500 }),
+      "We could not reach the booking service. Your booking was not made, please try again.",
+    ],
+    [
+      "a network error",
+      HttpResponse.error(),
+      "We could not reach the booking service. Your booking was not made, please try again.",
+    ],
+  ])("shows a friendly message for %s", async (_name, response, expected) => {
+    setFixedBookings(listing.id, []);
+    server.use(http.post("*/api/bookings", () => response, { once: true }));
+    const user = userEvent.setup();
+    await openListing();
+
+    await user.click(day("Monday, October 12, 2026"));
+    await user.click(day("Wednesday, October 14, 2026"));
+    await fillGuestDetails(user);
+    await user.click(screen.getByRole("button", { name: "Book now" }));
+
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+    expect(screen.queryByText(/Request failed/)).not.toBeInTheDocument();
+  });
+
+  it("explains why a range that crosses a booked night cannot be chosen", async () => {
+    setFixedBookings(listing.id, ["2026-10-15"]);
+    const user = userEvent.setup();
+    await openListing();
+
+    await user.click(day("Tuesday, October 13, 2026"));
+    await user.click(day("Saturday, October 17, 2026"));
+
+    expect(
+      screen.getByText(
+        "That range includes booked nights. Choose a check-out on or before Oct 15."
+      )
+    ).toBeInTheDocument();
+    // The guest's check-in is untouched.
+    expect(day("Tuesday, October 13, 2026")).toHaveAttribute("aria-pressed", "true");
+
+    // A valid check-out clears the message.
+    await user.click(day("Wednesday, October 14, 2026"));
+    expect(screen.queryByText(/That range includes booked nights/)).not.toBeInTheDocument();
+  });
+
+  it("says a booked or past day is not available, then clears it on a valid pick", async () => {
+    setFixedBookings(listing.id, ["2026-10-15"]);
+    const user = userEvent.setup();
+    await openListing();
+
+    await user.click(day("Thursday, October 15, 2026"));
+    expect(screen.getByText("That date is not available.")).toBeInTheDocument();
+
+    await user.click(day("Thursday, October 8, 2026"));
+    expect(screen.getByText("That date is not available.")).toBeInTheDocument();
+
+    await user.click(day("Monday, October 12, 2026"));
+    expect(screen.queryByText("That date is not available.")).not.toBeInTheDocument();
+  });
+
+  it("announces form errors in a summary", async () => {
+    setFixedBookings(listing.id, []);
+    const user = userEvent.setup();
+    await openListing();
+
+    await user.click(screen.getByRole("button", { name: "Book now" }));
+
+    const summary = screen
+      .getByText("Please fix the following:")
+      .closest('[role="alert"]');
+    expect(summary).toBeInstanceOf(HTMLElement);
+    if (!(summary instanceof HTMLElement)) return;
+    expect(within(summary).getByText("Enter your full name.")).toBeInTheDocument();
+    expect(within(summary).getByText("Enter your email address.")).toBeInTheDocument();
   });
 
   it("shows a not found page for an unknown listing", async () => {

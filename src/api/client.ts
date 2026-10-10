@@ -34,7 +34,7 @@ async function readErrorMessage(response: Response) {
   } catch {
     // Ignore errors, return generic message below
   }
-  return `Request failed with status ${response.status}`;
+  return "Something went wrong while contacting the server.";
 }
 
 export async function request<T>(

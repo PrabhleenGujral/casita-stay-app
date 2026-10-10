@@ -71,4 +71,60 @@ describe("search page", () => {
       await screen.findByText(/Showing 1–20 of 225 homes/)
     ).toBeInTheDocument();
   });
+
+  it("clears filters and the sort from the filter bar", async () => {
+    const user = userEvent.setup();
+    const { router } = renderApp("/?city=Kyoto&guests=4&sort=price-asc");
+    await screen.findByText(/Showing 1–/);
+
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+
+    expect(router.state.location.search).toBe("");
+    expect(screen.getByLabelText("Sort by")).toHaveValue("recommended");
+    expect(screen.getByLabelText("Where")).toHaveValue("");
+  });
+
+  it("offers Clear filters when only the sort was changed", async () => {
+    const user = userEvent.setup();
+    const { router } = renderApp("/?sort=rating");
+    await screen.findByText(/Showing 1–/);
+
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+
+    expect(router.state.location.search).toBe("");
+  });
+
+  it("clears filters and the sort from the empty state", async () => {
+    const user = userEvent.setup();
+    const { router } = renderApp("/?city=Atlantis&sort=price-desc");
+    await screen.findByText("No homes match your search");
+
+    // The filter bar button and the empty state button share a name, so pick the second.
+    const buttons = screen.getAllByRole("button", { name: "Clear filters" });
+    const emptyStateButton = buttons[buttons.length - 1];
+    if (!emptyStateButton) throw new Error("No empty state button");
+    await user.click(emptyStateButton);
+
+    expect(router.state.location.search).toBe("");
+    expect(await screen.findByText(/Showing 1–/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Sort by")).toHaveValue("recommended");
+  });
+
+  it("warns when the minimum price is higher than the maximum", async () => {
+    renderApp("/?minPrice=300&maxPrice=100");
+    await screen.findByText(/homes? found|Showing|No homes found/);
+
+    expect(
+      screen.getByText("Minimum price is higher than maximum.")
+    ).toBeInTheDocument();
+  });
+
+  it("does not warn for a valid price range", async () => {
+    renderApp("/?minPrice=100&maxPrice=300");
+    await screen.findByText(/Showing|No homes found/);
+
+    expect(
+      screen.queryByText("Minimum price is higher than maximum.")
+    ).not.toBeInTheDocument();
+  });
 });

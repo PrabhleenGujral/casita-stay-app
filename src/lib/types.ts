@@ -9,6 +9,7 @@ export interface AvailabilityCalendarProps {
   bookedDates: ReadonlySet<IsoDate>;
   range: DateRange;
   onSelect: (day: IsoDate) => void;
+  onReject?: (day: IsoDate) => void;
 }
 //listing card props
 export interface ListingCardProps {
@@ -39,5 +40,4 @@ export const DEFAULT_FILTERS: SearchFilters = {
 };
 
 export const SKELETON_COUNT = 8;
-// The first cards are above the fold, so their images load right away.
 export const PRIORITY_IMAGES = 4;

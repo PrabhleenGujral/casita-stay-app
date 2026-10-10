@@ -13,7 +13,14 @@ import styles from "./ListingPage.module.css";
 
 export function ListingPage() {
   const { id = "" } = useParams();
-  const { data: listing, isPending, isError, error, refetch } = useListing(id);
+  const {
+    data: listing,
+    isPending,
+    isError,
+    isFetching,
+    error,
+    refetch,
+  } = useListing(id);
   const favourites = useFavourites();
   const navigate = useNavigate();
 
@@ -46,6 +53,7 @@ export function ListingPage() {
       <ErrorState
         title="We could not load this home"
         onRetry={() => void refetch()}
+        isRetrying={isFetching}
       />
     );
   }

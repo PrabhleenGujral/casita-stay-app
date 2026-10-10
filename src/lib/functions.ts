@@ -7,6 +7,7 @@ import {
   parseISO,
   startOfWeek,
 } from "date-fns";
+import { ApiError } from "../api/client";
 import { addDaysIso, toIsoDate, type IsoDate } from "../domain/dates";
 import { CITIES } from "../domain/search";
 import { plural } from "./format";
@@ -65,12 +66,6 @@ export function clamp(day: IsoDate, min: IsoDate, max: IsoDate) {
   return day;
 }
 
-//change to price from string to number, return null if invalid or negative
-// export function toPrice(value: string) {
-//   const price = Number.parseInt(value, 10);
-//   return Number.isNaN(price) || price < 0 ? null : price;
-// }
-
 // change to price from string to number, return null if invalid or negative
 export function toPrice(value: string) {
   const trimmed = value.trim();
@@ -89,17 +84,37 @@ export function getHeading(city: string) {
   );
   return knownCity ? `Homes in ${knownCity}` : `Homes matching “${city}”`;
 }
-// Result summary for the search page
+// Result summary for the search page.
 export function getResultSummary(
   total: number,
   page: number,
-  pageSize: number
+  pageSize: number,
+  pageCount = 1
 ) {
   if (total === 0) return "No homes found";
 
   const first = (page - 1) * pageSize + 1;
-  const last = Math.min(page * pageSize, total);
+  const last = Math.min((page + pageCount - 1) * pageSize, total);
   if (first > total) return `${plural(total, "home")} found`;
 
   return `Showing ${first}–${last} of ${plural(total, "home")}`;
+}
+
+function withFullStop(text: string) {
+  const trimmed = text.trim();
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+}
+
+// (A 409 conflict is handled separately because it also resets the dates.)
+export function getBookingErrorMessage(error: Error) {
+  let reason = "We could not reach the booking service.";
+
+  if (error instanceof ApiError) {
+    if (error.status === 404) {
+      reason = "This home is no longer available.";
+    } else if (error.status >= 400 && error.status < 500) {
+      reason = withFullStop(error.message);
+    }
+  }
+  return `${reason} Your booking was not made, please try again.`;
 }

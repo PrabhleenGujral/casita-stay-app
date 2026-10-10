@@ -53,6 +53,7 @@ export function SavedPage() {
             failedResults.length > 1 ? "s" : ""
           } did not load`}
           onRetry={retryFailed}
+          isRetrying={failedResults.some((result) => result.isFetching)}
         />
       )}
 

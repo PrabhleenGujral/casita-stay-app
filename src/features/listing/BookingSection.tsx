@@ -12,6 +12,7 @@ import { ErrorState } from "../../components/ErrorState";
 import type { DateRange, IsoDate } from "../../domain/dates";
 import {
   EMPTY_RANGE,
+  nextBookedDate,
   selectDay,
   toIsoDate,
   upcomingMonths,
@@ -21,6 +22,7 @@ import {
 import type { GuestDetails } from "../../domain/guestDetails";
 import { calculatePrice } from "../../domain/pricing";
 import { formatShortDate, formatCents, plural } from "../../lib/format";
+import { getBookingErrorMessage } from "../../lib/functions";
 import type { ConfirmationState } from "../booking/confirmationState";
 import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import { BookingForm } from "./BookingForm";
@@ -46,13 +48,13 @@ export function BookingSection({ listing }: { listing: Listing }) {
 
   const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
   const [submitError, setSubmitError] = useState<SubmitError | null>(null);
+  const [dateNotice, setDateNotice] = useState("");
 
   const availability = useAvailability(listing.id, months);
   const booking = useCreateBooking();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Check the chosen dates and work out the price
   let nights: number | null = null;
   if (range.checkIn && range.checkOut) {
     const validation = validateRange(
@@ -75,13 +77,37 @@ export function BookingSection({ listing }: { listing: Listing }) {
 
   const handleSelect = (day: IsoDate) => {
     setSubmitError(null);
+    setDateNotice("");
     setRange((current) => selectDay(current, day, availability.bookedDates));
+  };
+
+  const handleReject = (day: IsoDate) => {
+    const { checkIn, checkOut } = range;
+    const lastCheckOut = checkIn
+      ? nextBookedDate(checkIn, availability.bookedDates)
+      : null;
+    const isPickingCheckOut =
+      checkIn !== null && checkOut === null && day > checkIn;
+    const isInsideWindow = day >= today && day <= lastDay;
+
+    if (
+      isPickingCheckOut &&
+      isInsideWindow &&
+      lastCheckOut &&
+      day > lastCheckOut
+    ) {
+      setDateNotice(
+        `That range includes booked nights. Choose a check-out on or before ${formatShortDate(
+          lastCheckOut
+        )}.`
+      );
+    } else {
+      setDateNotice("That date is not available.");
+    }
   };
 
   const handleBookingSuccess = (result: Booking, details: GuestDetails) => {
     refreshAvailability();
-
-    // The confirmation page reads this data from the router state.
     const state: ConfirmationState = {
       booking: result,
       listing: {
@@ -98,17 +124,13 @@ export function BookingSection({ listing }: { listing: Listing }) {
     // 409 means someone else booked these nights first.
     if (error instanceof ApiError && error.status === 409) {
       setSubmitError({ kind: "conflict" });
+      setDateNotice("");
       setRange(EMPTY_RANGE);
       refreshAvailability();
       return;
     }
 
-    // Show the server's message for 4xx errors, a generic one otherwise.
-    const message =
-      error instanceof ApiError && error.status < 500
-        ? error.message
-        : "We could not reach the booking service.";
-    setSubmitError({ kind: "failed", message });
+    setSubmitError({ kind: "failed", message: getBookingErrorMessage(error) });
   };
 
   const handleSubmit = (details: GuestDetails) => {
@@ -128,7 +150,6 @@ export function BookingSection({ listing }: { listing: Listing }) {
     });
   };
 
-  // The calendar area changes depending on the availability request.
   let calendar;
   if (availability.isPending) {
     calendar = (
@@ -142,6 +163,7 @@ export function BookingSection({ listing }: { listing: Listing }) {
         title="Availability did not load"
         message="We need the calendar to show which dates are free."
         onRetry={() => void availability.refetch()}
+        isRetrying={availability.isRetrying}
       />
     );
   } else {
@@ -153,6 +175,7 @@ export function BookingSection({ listing }: { listing: Listing }) {
         bookedDates={availability.bookedDates}
         range={range}
         onSelect={handleSelect}
+        onReject={handleReject}
       />
     );
   }
@@ -169,7 +192,10 @@ export function BookingSection({ listing }: { listing: Listing }) {
             <button
               type="button"
               className="button button-secondary"
-              onClick={() => setRange(EMPTY_RANGE)}
+              onClick={() => {
+                setRange(EMPTY_RANGE);
+                setDateNotice("");
+              }}
             >
               Clear dates
             </button>
@@ -177,6 +203,9 @@ export function BookingSection({ listing }: { listing: Listing }) {
         </div>
         <p className={styles.hint} aria-live="polite">
           {getRangeHint(range, nights)}
+        </p>
+        <p className={styles.notice} aria-live="polite">
+          {dateNotice}
         </p>
 
         {calendar}
@@ -210,11 +239,7 @@ export function BookingSection({ listing }: { listing: Listing }) {
               deciding. We have refreshed the calendar, please choose new dates.
             </p>
           )}
-          {submitError?.kind === "failed" && (
-            <p>
-              {submitError.message} Your booking was not made, please try again.
-            </p>
-          )}
+          {submitError?.kind === "failed" && <p>{submitError.message}</p>}
         </div>
 
         <BookingForm

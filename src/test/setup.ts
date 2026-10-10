@@ -5,7 +5,6 @@ import { mockConfig } from "../mocks/handlers";
 import { resetDb } from "../mocks/db";
 import { server } from "../mocks/node";
 
-// Tests should be fast and deterministic, so the mock API never stalls or fails on its own.
 Object.assign(mockConfig, {
   minLatency: 0,
   maxLatency: 0,
@@ -13,11 +12,23 @@ Object.assign(mockConfig, {
   conflictRate: 0,
 });
 
-// The first import of a lazy route is transformed on demand, which can take over a second.
 configure({ asyncUtilTimeout: 3000 });
 
-// jsdom does not implement scrolling; ScrollRestoration calls it on every navigation.
 window.scrollTo = () => {};
+
+class NoopIntersectionObserver implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = "";
+  readonly scrollMargin = "";
+  readonly thresholds: readonly number[] = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+window.IntersectionObserver = NoopIntersectionObserver;
 
 beforeAll(() => {
   server.listen({ onUnhandledFrame: "error" });
@@ -33,4 +44,3 @@ afterEach(() => {
 afterAll(() => {
   server.close();
 });
-// ...existing code...

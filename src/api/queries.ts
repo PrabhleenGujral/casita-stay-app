@@ -1,6 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import {
   keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQueries,
   useQuery,
@@ -26,9 +27,15 @@ export const listingKeys = {
 
 // Search results.
 export function useListingSearch(filters: SearchFilters) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: listingKeys.search(filters),
-    queryFn: ({ signal }) => fetchListings(filters, signal),
+    initialPageParam: filters.page,
+    queryFn: ({ pageParam, signal }) =>
+      fetchListings({ ...filters, page: pageParam }, signal),
+    getNextPageParam: (lastPage) =>
+      lastPage.page * lastPage.pageSize < lastPage.total
+        ? lastPage.page + 1
+        : undefined,
     placeholderData: keepPreviousData,
   });
 }
@@ -57,7 +64,13 @@ function combineAvailability(results: UseQueryResult<Availability>[]) {
     isPending: results.some((result) => result.isPending),
     isFetching: results.some((result) => result.isFetching),
     isError: results.some((result) => result.isError),
-    refetch: () => Promise.all(results.map((result) => result.refetch())),
+    isRetrying: results.some((result) => result.isError && result.isFetching),
+    refetch: () =>
+      Promise.all(
+        results
+          .filter((result) => result.isError)
+          .map((result) => result.refetch())
+      ),
   };
 }
 

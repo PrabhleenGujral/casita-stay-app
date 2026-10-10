@@ -93,3 +93,14 @@
     grid-column: auto;
   }
 }
+
+/* Inline hint under the price inputs; takes no space while empty. */
+.priceHint {
+  margin: 0.25rem 0 0;
+  color: var(--color-danger);
+  font-size: 0.8125rem;
+}
+
+.priceHint:empty {
+  margin: 0;
+}

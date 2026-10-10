@@ -21,8 +21,8 @@ describe("parseFilters", () => {
       )
     ).toEqual({
       city: "Lisbon",
-      minPrice: 50,
-      maxPrice: 200,
+      minPrice: 5000,
+      maxPrice: 20000,
       guests: 3,
       sort: "price-asc",
       page: 2,
@@ -35,9 +35,9 @@ describe("parseFilters", () => {
     );
   });
 
-  it("swaps an inverted price range", () => {
+  it("keeps an inverted price range as typed so the page can warn about it", () => {
     const filters = parse("minPrice=300&maxPrice=100");
-    expect([filters.minPrice, filters.maxPrice]).toEqual([100, 300]);
+    expect([filters.minPrice, filters.maxPrice]).toEqual([30000, 10000]);
   });
 });
 
