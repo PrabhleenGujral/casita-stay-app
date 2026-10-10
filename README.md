@@ -1,13 +1,13 @@
 # Casita Stays
 
-A home rental app built with **React 19, TypeScript, and TanStack Query**. Users can search for homes, view details, check availability, calculate prices, and book stays. 
+A home rental app built with **React 19, TypeScript, and TanStack Query**. Users can search for homes, view details, check availability, calculate prices, and book stays.
 
-Features infinite scroll, mini calendar previews, and performance optimizations. 
+Features infinite scroll, mini calendar previews, and performance optimizations.
 
 The API is mocked with MSW and intentionally simulates slow requests and errors.
 
 **Project Link**: https://casita-stays-app.netlify.app/  
-**Status**: 🟢 Production Ready | **Build**: ✅ 584 modules | **Size**: 308 KB gzipped
+ **Build**: 584 modules | **Size**: 308 KB gzipped
 
 ## Getting Started
 
