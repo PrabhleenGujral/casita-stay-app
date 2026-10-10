@@ -148,6 +148,16 @@ export function SearchPage() {
         {!hasMore && items.length > 0 && (
           <div className={styles.endMessage}>
             <p>You've reached the end of available homes</p>
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={() => {
+                setFilters({ page: 1 });
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              ↑ Back to Top
+            </button>
           </div>
         )}
       </>

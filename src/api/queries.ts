@@ -25,7 +25,8 @@ export const listingKeys = {
     ["listings", "availability", id, month] as const,
 };
 
-// Search results.
+// Search results. Every page that is loaded is kept (not replaced), so the
+// list keeps growing as the user scrolls and earlier homes stay available.
 export function useListingSearch(filters: SearchFilters) {
   return useInfiniteQuery({
     queryKey: listingKeys.search(filters),

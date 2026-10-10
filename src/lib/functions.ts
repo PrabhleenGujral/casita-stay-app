@@ -72,7 +72,6 @@ export function toPrice(value: string) {
   if (trimmed === "") return null;
   const num = Number(trimmed);
   if (Number.isNaN(num) || num < 0) return null;
-  // treat input as dollars and return integer cents
   return Math.round(num * 100);
 }
 //city heading for the search page
